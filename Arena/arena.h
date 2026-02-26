@@ -54,6 +54,19 @@ public:
 		return obj;
 	}
 
+	void* alloc_raw(size_t size, size_t aligment = 1) {
+		size_t start = (offset_ + aligment - 1) & ~(aligment - 1);
+
+		if (start + size > data_.size()) {
+			throw std::bad_alloc();
+		}
+
+		void* ptr = &data_[start];
+		offset_ = start + size;
+
+		return ptr;
+	}
+
 	void reset() {
 		while (last_task_ != nullptr) {
 			last_task_->destroyer(last_task_->ptr);
