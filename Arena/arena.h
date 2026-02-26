@@ -10,6 +10,11 @@ struct DestructionTask {
 	DestructionTask* prev = nullptr;
 };
 
+struct Marker {
+	size_t offset;
+	DestructionTask* last_task;
+};
+
 class Arena {
 	std::vector<std::byte> data_;
 	DestructionTask* last_task_ = nullptr;
@@ -65,6 +70,18 @@ public:
 		offset_ = start + size;
 
 		return ptr;
+	}
+
+	Marker get_marker() const  {
+		return {offset_, last_task_};
+	}
+
+	void rollback(Marker marker) {
+		while (last_task_ != marker.last_task && last_task_ != nullptr) {
+			last_task_->destroyer(last_task_->ptr);
+			last_task_ = last_task_->prev;
+		}
+		offset_ = marker.offset;
 	}
 
 	void reset() {
