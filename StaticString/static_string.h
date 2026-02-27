@@ -1,5 +1,4 @@
-#include <array>
-#include <string_view>
+
 
 template <size_t N>
 struct StaticString {
@@ -17,6 +16,19 @@ struct StaticString {
 	constexpr char operator[](size_t i) const { return data[i]; }
 	constexpr size_t size() const { return length; }
 	constexpr const char* c_str() const { return data; }
+
+	template <size_t Start, size_t Count>
+	constexpr auto substr() const {
+		static_assert(Start + Count < N, "Substr out of range");
+		
+		StaticString<Count + 1> result;
+		for (size_t i = 0; i < Count; i++) {
+			result.data[i] = data[Start + i];
+		}
+		result.data[Count] = '\0';
+		
+		return result;
+	}
 };
 
 template <size_t N>

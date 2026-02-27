@@ -12,6 +12,14 @@ int main() {
 	static_assert(res[6] == 'w');
 
 	std::cout << res.c_str() << std::endl;
-	
+
+	constexpr auto substr = res.substr<4, 7>();
+
+	static_assert(substr[0] == 'o');
+	static_assert(substr[2] == 'w');
+	static_assert(substr[6] == 'd');
+
+	std::cout << substr.c_str() << std::endl;
+
 	return 0;
 }
