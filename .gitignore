@@ -1,3 +1,12 @@
-DataBuffer/.
-DataBuffer/..
-DataBuffer/bin
+.DS_Store
+
+*.swp
+*.swo
+
+build/
+bin/
+*.o
+*.out
+
+.vscode/
+.idea/
