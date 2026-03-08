@@ -4,6 +4,29 @@ project(EngineSystems LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror)
+endif()
+
+find_program(CLANG_FORMAT "clang-format")
+
+if(CLANG_FORMAT)
+    file(GLOB_RECURSE ALL_SOURCE_FILES
+         *.cpp *.h *.hpp)
+
+    add_custom_target(format
+        COMMAND ${CLANG_FORMAT} -i ${ALL_SOURCE_FILES}
+        COMMENT "Formatting all source files with clang-format..."
+    )
+endif()
+
+find_program(CLANG_TIDY "clang-tidy")
+
+if(CLANG_TIDY)
+	set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY} "-header-filter=.*;-warnings-as-errors=*")
+endif()
 
 option(USE_ASAN "Enable Address Sanitizer" OFF)
 option(USE_TSAN "Enable Thread Sanitizer" OFF)

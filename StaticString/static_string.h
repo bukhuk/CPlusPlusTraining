@@ -1,50 +1,52 @@
 
 
-template <size_t N>
-struct StaticString {
-	char data[N]{};
-	size_t length = N - 1;
+template <size_t N> struct StaticString {
+    char data[N]{};
+    size_t length = N - 1;
 
-	constexpr StaticString(const char (&str)[N]) {
-		for (size_t i = 0; i < N; i++) {
-			data[i] = str[i];
-		}
-	}
+    constexpr StaticString(const char (&str)[N]) {
+        for (size_t i = 0; i < N; i++) {
+            data[i] = str[i];
+        }
+    }
 
-	constexpr StaticString() = default;
-	
-	constexpr char operator[](size_t i) const { return data[i]; }
-	constexpr size_t size() const { return length; }
-	constexpr const char* c_str() const { return data; }
+    constexpr StaticString() = default;
 
-	template <size_t Start, size_t Count>
-	constexpr auto substr() const {
-		static_assert(Start + Count < N, "Substr out of range");
-		
-		StaticString<Count + 1> result;
-		for (size_t i = 0; i < Count; i++) {
-			result.data[i] = data[Start + i];
-		}
-		result.data[Count] = '\0';
-		
-		return result;
-	}
+    constexpr char operator[](size_t i) const {
+        return data[i];
+    }
+    constexpr size_t size() const {
+        return length;
+    }
+    constexpr const char *c_str() const {
+        return data;
+    }
+
+    template <size_t Start, size_t Count> constexpr auto substr() const {
+        static_assert(Start + Count < N, "Substr out of range");
+
+        StaticString<Count + 1> result;
+        for (size_t i = 0; i < Count; i++) {
+            result.data[i] = data[Start + i];
+        }
+        result.data[Count] = '\0';
+
+        return result;
+    }
 };
 
-template <size_t N>
-StaticString(const char (&str)[N]) -> StaticString<N>;
+template <size_t N> StaticString(const char (&str)[N]) -> StaticString<N>;
 
-template <size_t N, size_t M>
-constexpr auto operator+(StaticString<N> lhs, StaticString<M> rhs) {
-	StaticString<N + M - 1> result;
-	
-	for (size_t i = 0; i < N - 1; i++) {
-		result.data[i] = lhs[i];
-	}
+template <size_t N, size_t M> constexpr auto operator+(StaticString<N> lhs, StaticString<M> rhs) {
+    StaticString<N + M - 1> result;
 
-	for (size_t i = 0; i < M; i++) {
-		result.data[N + i - 1] = rhs[i];
-	}
+    for (size_t i = 0; i < N - 1; i++) {
+        result.data[i] = lhs[i];
+    }
 
-	return result;
+    for (size_t i = 0; i < M; i++) {
+        result.data[N + i - 1] = rhs[i];
+    }
+
+    return result;
 }

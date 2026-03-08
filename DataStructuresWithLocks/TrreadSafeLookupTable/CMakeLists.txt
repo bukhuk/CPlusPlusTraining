@@ -1,3 +1,5 @@
+cmake_policy(SET CMP0167 OLD)
+
 add_library(thread_safe_lookup_table INTERFACE)
 
 target_include_directories(thread_safe_lookup_table INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

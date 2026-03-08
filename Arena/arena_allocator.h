@@ -1,22 +1,20 @@
 #include <arena.h>
 
-template <typename T>
-class ArenaAllocator {
-	Arena* arena_;
+template <typename T> class ArenaAllocator {
+    Arena *arena_;
 
-public:
-	using value_type = T;
-	
-	explicit ArenaAllocator(Arena& arena) : arena_{&arena} {}
+  public:
+    using value_type = T;
 
-	template <typename U>
-	ArenaAllocator(const ArenaAllocator<U>& other) : arena_{other.arena_} {}
+    explicit ArenaAllocator(Arena &arena) : arena_{&arena} {}
 
-	T* allocate(size_t n) {
-		return static_cast<T*>(arena_->alloc_raw(n * sizeof(T), alignof(T)));
-	}
+    template <typename U> ArenaAllocator(const ArenaAllocator<U> &other) : arena_{other.arena_} {}
 
-	void deallocate(T* p, size_t n) noexcept {}
+    T *allocate(size_t n) {
+        return static_cast<T *>(arena_->alloc_raw(n * sizeof(T), alignof(T)));
+    }
 
-	template <typename U> friend class ArenaAllocator;	
+    void deallocate([[maybe_unused]] T *p, [[maybe_unused]] size_t n) noexcept {}
+
+    template <typename U> friend class ArenaAllocator;
 };

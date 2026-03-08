@@ -1,41 +1,41 @@
 #include <iostream>
-#include <string>
 #include <list>
+#include <string>
 
 #include "arena_allocator.h"
 
 int main() {
-	const int iterations = 100'000;
-	
-	{
-		auto start = std::chrono::high_resolution_clock::now();
+    const int iterations = 100'000;
 
-		std::list<int> std_list;
-		for (int i = 0; i < iterations; i++) {
-			std_list.push_back(i);
-		}
+    {
+        auto start = std::chrono::high_resolution_clock::now();
 
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> diff = end - start;
-		std::cout << "Standart std::list: " << diff.count() << std::endl;
-	}
+        std::list<int> std_list;
+        for (int i = 0; i < iterations; i++) {
+            std_list.push_back(i);
+        }
 
-	{
-		Arena arena(1 << 25);
-		ArenaAllocator<int> alloc(arena);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Standart std::list: " << diff.count() << std::endl;
+    }
 
-		auto start = std::chrono::high_resolution_clock::now();
+    {
+        Arena arena(1 << 25);
+        ArenaAllocator<int> alloc(arena);
 
-		std::list<int, ArenaAllocator<int>> arena_list(alloc);
+        auto start = std::chrono::high_resolution_clock::now();
 
-		for (int i = 0; i < iterations; i++) {
-			arena_list.push_back(i);
-		}
+        std::list<int, ArenaAllocator<int>> arena_list(alloc);
 
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> diff = end - start;
-		std::cout << "Arena std::list: " << diff.count() << std::endl;
-	}
+        for (int i = 0; i < iterations; i++) {
+            arena_list.push_back(i);
+        }
 
-	return 0;
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Arena std::list: " << diff.count() << std::endl;
+    }
+
+    return 0;
 }

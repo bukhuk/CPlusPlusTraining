@@ -1,0 +1,19 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  portability-*,
+  clang-analyzer-*,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+
+WarningsAsErrors: 'cppcoreguidelines-*,bugprone-*'
+
+CheckOptions:
+  - key:             modernize-use-trailing-return-type.MinConfidence
+    value:           'high'
+---

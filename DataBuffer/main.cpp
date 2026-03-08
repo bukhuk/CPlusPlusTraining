@@ -1,18 +1,18 @@
-#include <iostream>
 #include "data_buffer.h"
+#include <iostream>
 
 int main() {
-	DataBuffer buffer(256);
-	buffer.append_many(1, 2, 3, 4, 5);
+    DataBuffer buffer(256);
+    buffer.append_many(1, 2, 3, 4, 5);
 
-	BufferView bv = buffer.view_as<int>();
+    BufferView bv = buffer.view_as<int>();
 
-	auto it = bv.begin();
-	while (it != bv.end()) {
-		std::cout << *it << " ";
-		it++;
-	}
-	std::cout << std::endl;
+    auto it = bv.begin();
+    while (it != bv.end()) {
+        std::cout << *it << " ";
+        it++;
+    }
+    std::cout << std::endl;
 
-	return 0;
+    return 0;
 }
