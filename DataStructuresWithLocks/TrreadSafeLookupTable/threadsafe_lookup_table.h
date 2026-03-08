@@ -1,91 +1,89 @@
-#include <vector>
-#include <list>
-#include <memory>
 #include <algorithm>
 #include <functional>
+#include <list>
+#include <memory>
 #include <utility>
+#include <vector>
 
-#include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/lock_types.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
-template<typename Key, typename Value, typename Hash = std::hash<Key>>
+template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class threadsafe_lookup_table {
-private:
-	class bucket_type {
-	private:
-		using bucket_value = std::pair<Key, Value>;
-		using bucket_data = std::list<bucket_value>;
-		using bucket_iterator = typename bucket_data::iterator;
+  private:
+    class bucket_type {
+      private:
+        using bucket_value = std::pair<Key, Value>;
+        using bucket_data = std::list<bucket_value>;
+        using bucket_iterator = typename bucket_data::iterator;
 
-		bucket_data data_;
-		mutable boost::shared_mutex mutex;
+        bucket_data data_;
+        mutable boost::shared_mutex mutex;
 
-		bucket_iterator find_entry_for(Key const& key) const {
-			return std::find_if(data_.begin(), data_.end(), 
-							[&](bucket_value const& item) { 
-								return item.first == key;
-							});
-		}
+        bucket_iterator find_entry_for(Key const &key) const {
+            return std::find_if(data_.begin(), data_.end(),
+                                [&](bucket_value const &item) { return item.first == key; });
+        }
 
-	public:
-		Value value_for(Key const& key, Value const& default_value) const {
-			boost::shared_lock<boost::shared_mutex> lock(mutex);
-			bucket_iterator const found_entry = find_entry_for(key);
-			return found_entry == data_.end() ? default_value : found_entry->second;
-		}
+      public:
+        Value value_for(Key const &key, Value const &default_value) const {
+            boost::shared_lock<boost::shared_mutex> lock(mutex);
+            bucket_iterator const found_entry = find_entry_for(key);
+            return found_entry == data_.end() ? default_value : found_entry->second;
+        }
 
-		void add_or_update_mapping(Key const& key, Value const& value) {
-			std::unique_lock<boost::shared_mutex> lock(mutex);
-			bucket_iterator const found_entry = find_entry_for(key);
-			if (found_entry == data_.end()) {
-				data_.push_back(bucket_value(key, value));
-			} else {
-				found_entry->second = value;
-			}
-		}
+        void add_or_update_mapping(Key const &key, Value const &value) {
+            std::unique_lock<boost::shared_mutex> lock(mutex);
+            bucket_iterator const found_entry = find_entry_for(key);
+            if (found_entry == data_.end()) {
+                data_.push_back(bucket_value(key, value));
+            } else {
+                found_entry->second = value;
+            }
+        }
 
-		void remove_mapping(Key const& key) {
-			std::unique_lock<boost::shared_mutex> lock(mutex);
-			bucket_iterator const found_entry = find_entry_for(key);
-			if (found_entry != data_.end()) {
-				data_.erase(found_entry);
-			}
-		}
-	};
+        void remove_mapping(Key const &key) {
+            std::unique_lock<boost::shared_mutex> lock(mutex);
+            bucket_iterator const found_entry = find_entry_for(key);
+            if (found_entry != data_.end()) {
+                data_.erase(found_entry);
+            }
+        }
+    };
 
-	std::vector<std::unique_ptr<bucket_type>> buckets;
-	Hash hasher;
+    std::vector<std::unique_ptr<bucket_type>> buckets;
+    Hash hasher;
 
-	bucket_type& get_bucket(Key const& key) const {
-		std::size_t const bucket_index = hasher(key) % buckets.size();
-		return *buckets[bucket_index];
-	}
+    bucket_type &get_bucket(Key const &key) const {
+        std::size_t const bucket_index = hasher(key) % buckets.size();
+        return *buckets[bucket_index];
+    }
 
-public:
-	using key_type = Key;
-	using maped_type = Value;
-	using hash_type = Hash;
+  public:
+    using key_type = Key;
+    using maped_type = Value;
+    using hash_type = Hash;
 
-	threadsafe_lookup_table(unsigned num_buckets = 19, Hash const& hasher_ = Hash()) :
-		buckets(num_buckets), hasher(hasher_) {
-		for (size_t i = 0; i < num_buckets; i++) {
-			buckets[i].reset(new bucket_type);
-		}
-	}	   
+    threadsafe_lookup_table(unsigned num_buckets = 19, Hash const &hasher_ = Hash())
+        : buckets(num_buckets), hasher(hasher_) {
+        for (size_t i = 0; i < num_buckets; i++) {
+            buckets[i].reset(new bucket_type);
+        }
+    }
 
-	threadsafe_lookup_table(threadsafe_lookup_table const& other) = delete;
+    threadsafe_lookup_table(threadsafe_lookup_table const &other) = delete;
 
-	threadsafe_lookup_table& operator=(threadsafe_lookup_table const& other) = delete;
+    threadsafe_lookup_table &operator=(threadsafe_lookup_table const &other) = delete;
 
-	Value value_for(Key const& key, Value const& default_value = Value()) const {
-		return get_bucket(key).value_for(key, default_value);
-	}
+    Value value_for(Key const &key, Value const &default_value = Value()) const {
+        return get_bucket(key).value_for(key, default_value);
+    }
 
-	void add_or_update_mapping(Key const& key, Value const& value) {
-		get_bucket(key).add_or_update_mapping(key, value);
-	}
+    void add_or_update_mapping(Key const &key, Value const &value) {
+        get_bucket(key).add_or_update_mapping(key, value);
+    }
 
-	void remove_mapping(Key const& key) {
-		get_bucket(key).remove_mapping(key);
-	}
+    void remove_mapping(Key const &key) {
+        get_bucket(key).remove_mapping(key);
+    }
 };
