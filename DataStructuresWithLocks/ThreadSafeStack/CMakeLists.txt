@@ -1,0 +1,7 @@
+add_library(thread_safe_stack INTERFACE)
+
+target_include_directories(thread_safe_stack INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(thread_safe_stack_bench main.cpp)
+target_link_libraries(thread_safe_stack_bench PRIVATE thread_safe_stack)
+

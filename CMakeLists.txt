@@ -19,3 +19,8 @@ if(USE_TSAN)
 endif()
 
 add_subdirectory(Arena)
+add_subdirectory(DataBuffer)
+add_subdirectory(DataStructuresWithLocks/ThreadSafeStack)
+add_subdirectory(DataStructuresWithLocks/TrreadSafeLookupTable)
+add_subdirectory(StaticString)
+add_subdirectory(StringPool)
