@@ -1,8 +1,8 @@
+#include "arena_allocator.h"
+#include <chrono>
 #include <iostream>
 #include <list>
 #include <string>
-
-#include "arena_allocator.h"
 
 int main() {
     const int iterations = 100'000;

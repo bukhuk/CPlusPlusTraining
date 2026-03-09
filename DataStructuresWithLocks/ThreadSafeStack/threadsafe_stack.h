@@ -1,4 +1,5 @@
 #include <exception>
+#include <memory>
 #include <mutex>
 #include <stack>
 

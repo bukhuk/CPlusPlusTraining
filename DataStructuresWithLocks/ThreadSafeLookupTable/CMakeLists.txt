@@ -1,4 +1,6 @@
-cmake_policy(SET CMP0167 OLD)
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
 
 add_library(thread_safe_lookup_table INTERFACE)
 
